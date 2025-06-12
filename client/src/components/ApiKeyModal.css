@@ -203,3 +203,28 @@
     margin-bottom: 25px;
     color: var(--text-secondary);
 }
+
+/* Inherits most styles from AuthPage.css through the .auth-box class */
+
+.auth-sub-header {
+    margin-top: -15px;
+    margin-bottom: 25px;
+    color: var(--text-secondary);
+}
+
+/* 
+  Style for the new hyperlink within the label.
+  This makes it visually distinct but connected to the label text.
+*/
+.api-key-link {
+    font-weight: normal; /* Make the link text less bold than the label */
+    font-size: 0.8rem;   /* Make it slightly smaller */
+    margin-left: 8px;    /* Add some space between the label and the link */
+    color: var(--accent-active); /* Use the theme's active accent color */
+    text-decoration: none; /* Remove the underline by default */
+    transition: all 0.2s ease;
+}
+
+.api-key-link:hover {
+    text-decoration: underline; /* Add the underline back on hover for clarity */
+}

@@ -1,8 +1,7 @@
 // client/src/components/ApiKeyModal.js
 import React, { useState } from 'react';
-// We no longer need a dedicated CSS file if it's empty,
-// as styles are inherited from AuthPage's injected CSS.
-// import './ApiKeyModal.css'; 
+// Import the component's dedicated CSS file to style the new links
+import './ApiKeyModal.css'; 
 
 const ApiKeyModal = ({ username, onSave }) => {
     const [geminiApiKey, setGeminiApiKey] = useState('');
@@ -14,17 +13,16 @@ const ApiKeyModal = ({ username, onSave }) => {
         e.preventDefault();
         setError('');
 
-        // You can adjust this validation if only one key is required.
         if (!geminiApiKey.trim() || !grokApiKey.trim()) {
             setError('For the best experience, both Gemini and Grok API keys are recommended.');
-            // This is just a warning now, so we don't return.
         }
 
         setLoading(true);
         try {
             await onSave({ geminiApiKey, grokApiKey });
             // AuthPage handles navigation on success.
-        } catch (err) {
+        } catch (err)
+        {
             const errorMessage = err.response?.data?.message || 'Failed to save keys. Please try again.';
             setError(errorMessage);
         } finally {
@@ -32,9 +30,6 @@ const ApiKeyModal = ({ username, onSave }) => {
         }
     };
 
-    // ==================================================================
-    //  START OF MODIFICATION: Replaced overlay with .auth-box
-    // ==================================================================
     return (
         // Use the 'auth-box' class to inherit all styling from AuthPage
         <div className="auth-box"> 
@@ -43,7 +38,23 @@ const ApiKeyModal = ({ username, onSave }) => {
             
             <form onSubmit={handleSubmit}>
                 <div className="input-group">
-                    <label htmlFor="gemini-key">Gemini AI API Key</label>
+                    {/* ================================================================== */}
+                    {/* START OF MODIFICATION */}
+                    {/* ================================================================== */}
+                    <label htmlFor="gemini-key">
+                        Gemini AI API Key
+                        <a 
+                            href="https://aistudio.google.com/app/apikey" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="api-key-link"
+                        >
+                            (Get API Key)
+                        </a>
+                    </label>
+                    {/* ================================================================== */}
+                    {/* END OF MODIFICATION */}
+                    {/* ================================================================== */}
                     <input
                         id="gemini-key"
                         type="password"
@@ -51,11 +62,27 @@ const ApiKeyModal = ({ username, onSave }) => {
                         onChange={(e) => setGeminiApiKey(e.target.value)}
                         placeholder="Enter your Gemini API Key"
                         disabled={loading}
-                        autoComplete="new-password" // Prevent browser autofill
+                        autoComplete="new-password"
                     />
                 </div>
                 <div className="input-group">
-                    <label htmlFor="grok-key">Grok API Key</label>
+                    {/* ================================================================== */}
+                    {/* START OF MODIFICATION */}
+                    {/* ================================================================== */}
+                    <label htmlFor="grok-key">
+                        Grok API Key
+                        <a 
+                            href="https://console.groq.com/keys" 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            className="api-key-link"
+                        >
+                            (Get API Key)
+                        </a>
+                    </label>
+                    {/* ================================================================== */}
+                    {/* END OF MODIFICATION */}
+                    {/* ================================================================== */}
                     <input
                         id="grok-key"
                         type="password"
@@ -63,7 +90,7 @@ const ApiKeyModal = ({ username, onSave }) => {
                         onChange={(e) => setGrokApiKey(e.target.value)}
                         placeholder="Enter your Grok API Key"
                         disabled={loading}
-                        autoComplete="new-password" // Prevent browser autofill
+                        autoComplete="new-password"
                     />
                 </div>
                 {error && <p className="error-message">{error}</p>}
@@ -73,9 +100,6 @@ const ApiKeyModal = ({ username, onSave }) => {
             </form>
         </div>
     );
-    // ==================================================================
-    //  END OF MODIFICATION
-    // ==================================================================
 };
 
 export default ApiKeyModal;
