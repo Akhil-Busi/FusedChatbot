@@ -14,8 +14,12 @@ const readline = require('readline').createInterface({
 
 const connectDB = require('./config/db');
 const { performAssetCleanup } = require('./utils/assetCleanup');
-// No longer need a separate history route if it's part of chat.js now
-const historyRoutes = require('./routes/history'); 
+const analysisRoutes = require('./routes/analysis');
+
+// --- START OF MODIFICATION ---
+// Import the new history routes
+const historyRoutes = require('./routes/history');
+// --- END OF MODIFICATION ---
 
 const DEFAULT_PORT = 5000;
 const DEFAULT_MONGO_URI = 'mongodb://localhost:27017/chatbotGeminiDB';
@@ -39,8 +43,11 @@ app.use('/api/chat', require('./routes/chat'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/files', require('./routes/files'));
 app.use('/api/syllabus', require('./routes/syllabus'));
-app.use('/api/analysis', require('./routes/analysis'));
+app.use('/api/analysis', analysisRoutes);
+// --- START OF MODIFICATION ---
+// Mount the new history routes
 app.use('/api/history', historyRoutes);
+// --- END OF MODIFICATION ---
 
 app.use((err, req, res, next) => {
     console.error("Unhandled Error:", err.stack || err);

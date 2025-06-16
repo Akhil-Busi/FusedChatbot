@@ -20,32 +20,16 @@ mermaid.initialize({
 
 
 const MermaidDiagram = ({ chart }) => {
-    const { theme } = useTheme(); // Get the current theme ('light' or 'dark')
-
-   useEffect(() => {
-    if (chart) {
-        mermaid.initialize({
-            startOnLoad: false,
-            theme: theme,
-            securityLevel: 'loose',
-            fontFamily: 'sans-serif',
-            logLevel: 'info',
-            mindmap: {
-                padding: 15,
-            },
-        });
-
-        try {
-            mermaid.run(); // This will throw if the chart has invalid Mermaid syntax
-        } catch (err) {
-            console.error("Mermaid render error:", err);
-            const errContainer = document.querySelector('.mermaid');
-            if (errContainer) {
-                errContainer.innerHTML = `<div style="color:red;">⚠️ Invalid Mermaid syntax</div>`;
-            }
+    
+    // This effect will run after the component mounts and whenever the chart data changes.
+    useEffect(() => {
+        // The mermaid.run() function is designed to find all elements with the class 'mermaid'
+        // and render them. It's the most reliable way to render in a dynamic framework like React.
+        if (chart) {
+            // This ensures that rendering happens only after React has updated the DOM with the new chart data.
+            mermaid.run();
         }
-    }
-}, [chart, theme]); // Rerun this effect if either the chart data OR the theme changes.
+    }, [chart]); // The dependency array is crucial.
 
     if (!chart) {
         return <div className="mermaid-error">No mind map data to display.</div>;
