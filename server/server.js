@@ -5,7 +5,6 @@ const path = require('path');
 const { getLocalIPs } = require('./utils/networkUtils');
 const fs = require('fs');
 const axios = require('axios');
-const os = require('os');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const readline = require('readline').createInterface({
@@ -15,12 +14,8 @@ const readline = require('readline').createInterface({
 
 const connectDB = require('./config/db');
 const { performAssetCleanup } = require('./utils/assetCleanup');
-const analysisRoutes = require('./routes/analysis');
-
-// --- START OF MODIFICATION ---
-// Import the new history routes
-const historyRoutes = require('./routes/history');
-// --- END OF MODIFICATION ---
+// No longer need a separate history route if it's part of chat.js now
+const historyRoutes = require('./routes/history'); 
 
 const DEFAULT_PORT = 5000;
 const DEFAULT_MONGO_URI = 'mongodb://localhost:27017/chatbotGeminiDB';
@@ -29,7 +24,8 @@ const DEFAULT_PYTHON_SERVICE_URL = 'http://localhost:5001';
 let port = process.env.PORT || DEFAULT_PORT;
 let mongoUri = process.env.MONGO_URI || '';
 let pythonServiceUrl = process.env.PYTHON_AI_CORE_SERVICE_URL || '';
-let geminiApiKey = process.env.GEMINI_API_KEY || '';
+
+// REMOVED: let geminiApiKey = process.env.GEMINI_API_KEY || '';
 
 const app = express();
 app.use(cors());
@@ -43,11 +39,8 @@ app.use('/api/chat', require('./routes/chat'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/files', require('./routes/files'));
 app.use('/api/syllabus', require('./routes/syllabus'));
-app.use('/api/analysis', analysisRoutes);
-// --- START OF MODIFICATION ---
-// Mount the new history routes
+app.use('/api/analysis', require('./routes/analysis'));
 app.use('/api/history', historyRoutes);
-// --- END OF MODIFICATION ---
 
 app.use((err, req, res, next) => {
     console.error("Unhandled Error:", err.stack || err);
@@ -157,15 +150,19 @@ function askQuestion(query) {
 
 async function configureAndStart() {
     console.log("--- Starting Server Configuration ---");
-    if (!geminiApiKey) {
-        console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        console.error("!!! FATAL: GEMINI_API_KEY environment variable is not set. !!!");
-        console.error("!!! Please set it in your .env file.                     !!!");
-        console.error("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        process.exit(1);
-    } else {
-        console.log("✓ GEMINI_API_KEY found (from .env).");
-    }
+    
+    // ==================================================================
+    //  START OF THE FIX: The obsolete API key check has been removed.
+    // ==================================================================
+
+    // The server no longer needs to know about any global API keys at startup.
+    // Keys are now fetched per-user, per-request from the database.
+    console.log("✓ API keys will be handled on a per-user basis. No global key check needed.");
+
+    // ==================================================================
+    //  END OF THE FIX
+    // ==================================================================
+    
     if (!mongoUri) {
         const answer = await askQuestion(`Enter MongoDB URI or press Enter for default (${DEFAULT_MONGO_URI}): `);
         mongoUri = answer.trim() || DEFAULT_MONGO_URI;

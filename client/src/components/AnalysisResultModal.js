@@ -28,7 +28,7 @@ const AnalysisResultModal = ({ isOpen, onClose, analysisData }) => {
 
     // This hook memoizes the handleCopy function. It is now at the top level.
     const handleCopy = useCallback(() => {
-        // We use optional chaining `?.` because analysisData might be null initially.
+        // We use optional chaining ?. because analysisData might be null initially.
         if (analysisData?.result) {
             navigator.clipboard.writeText(analysisData.result).then(() => {
                 setIsCopied(true);
@@ -87,7 +87,7 @@ const AnalysisResultModal = ({ isOpen, onClose, analysisData }) => {
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="modal-header">
                     <h3 className="modal-title">
-                        {type ? `${type.charAt(0).toUpperCase() + type.slice(1)}` : 'Analysis'} Results
+                        {(type ? (type.charAt(0).toUpperCase() + type.slice(1)) : 'Analysis') + ' Results'}
                     </h3>
                     <button onClick={onClose} className="modal-close-button" title="Close">
                         <FiX size={24} />

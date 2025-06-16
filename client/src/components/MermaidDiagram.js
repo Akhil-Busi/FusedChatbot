@@ -1,13 +1,14 @@
-// client/src/components/MermaidDiagram.js (FIXED and IMPROVED)
-
+// client/src/components/MermaidDiagram.js
 import React, { useEffect } from 'react';
 import mermaid from 'mermaid';
+import { useTheme } from '../context/ThemeContext'; // Import our theme hook
 
 // Initialize Mermaid ONCE when the module loads.
 // This is more efficient than re-initializing on every render.
+// The theme will be set dynamically in the effect.
 mermaid.initialize({
     startOnLoad: false, // We will control the rendering manually
-    theme: 'dark',
+    // theme: 'dark', // Theme is now set dynamically below
     securityLevel: 'loose', // Required for dynamic rendering
     fontFamily: 'sans-serif',
     logLevel: 'info', // 'debug' for more details, 'info' for less
@@ -17,17 +18,34 @@ mermaid.initialize({
     },
 });
 
+
 const MermaidDiagram = ({ chart }) => {
-    
-    // This effect will run after the component mounts and whenever the chart data changes.
-    useEffect(() => {
-        // The mermaid.run() function is designed to find all elements with the class 'mermaid'
-        // and render them. It's the most reliable way to render in a dynamic framework like React.
-        if (chart) {
-            // This ensures that rendering happens only after React has updated the DOM with the new chart data.
-            mermaid.run();
+    const { theme } = useTheme(); // Get the current theme ('light' or 'dark')
+
+   useEffect(() => {
+    if (chart) {
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: theme,
+            securityLevel: 'loose',
+            fontFamily: 'sans-serif',
+            logLevel: 'info',
+            mindmap: {
+                padding: 15,
+            },
+        });
+
+        try {
+            mermaid.run(); // This will throw if the chart has invalid Mermaid syntax
+        } catch (err) {
+            console.error("Mermaid render error:", err);
+            const errContainer = document.querySelector('.mermaid');
+            if (errContainer) {
+                errContainer.innerHTML = `<div style="color:red;">⚠️ Invalid Mermaid syntax</div>`;
+            }
         }
-    }, [chart]); // The dependency array is crucial.
+    }
+}, [chart, theme]); // Rerun this effect if either the chart data OR the theme changes.
 
     if (!chart) {
         return <div className="mermaid-error">No mind map data to display.</div>;
